@@ -1,4 +1,4 @@
-package com.example.camtocal;
+package com.example.CamToCal;
 
 import android.content.Context;
 
