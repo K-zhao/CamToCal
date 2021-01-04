@@ -25,7 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CamToCAl">
-        <activity android:name=".ui.Display"></activity>
+        <activity android:name=".ui.Display" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -48,6 +48,9 @@
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="ocr" />
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />
     </application>
 
