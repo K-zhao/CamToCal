@@ -8,22 +8,23 @@
 
     <Button
         android:id="@+id/enableCamera"
-        android:layout_width="420dp"
-        android:layout_height="124dp"
-        android:layout_marginStart="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="129dp"
         android:gravity="center"
-        android:text="Open Camera"
         android:onClick="takePicture"
+        android:text="@string/open_camera"
+        app:iconPadding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.973" />
+        app:layout_constraintVertical_bias="0.991" />
 
     <Button
         android:id="@+id/openGallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Show photo "
+        android:text="@string/show_photo"
         android:onClick="showPicture"
         app:layout_constraintBottom_toTopOf="@+id/enableCamera"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,12 +33,13 @@
 
     <TextView
         android:id="@+id/container"
-        android:layout_width="405dp"
+        android:layout_width="match_parent"
         android:layout_height="81dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="This is a CameraX test app!"
+        android:text="@string/welcome"
         android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

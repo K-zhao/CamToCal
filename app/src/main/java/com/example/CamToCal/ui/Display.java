@@ -2,10 +2,19 @@ package com.example.CamToCal.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -24,11 +33,18 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class Display extends AppCompatActivity {
 
     private Bitmap bitmap;
+    private Button calendarBtn;
+    final int callbackID = 42;
+
+
 
     // Different models for text recognition
     private static final int DENSE_MODEL = 2;
@@ -38,15 +54,30 @@ public class Display extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
+        String[] permissions = {Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR};
+        checkPermission(callbackID, permissions);
         ImageView imageView = findViewById(R.id.imageView2);
-
         bitmap = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
-
+        calendarBtn = findViewById(R.id.calendarBtn);
         imageView.setImageBitmap(bitmap);
         runFirebaseTextRecognition();
 //        runTextRecognition();
     }
 
+
+    // Ask for permission to access user calendar
+    private void checkPermission(int callbackID, String[] permissionsId) {
+        boolean permissions = true;
+        for (String p : permissionsId) {
+            permissions = permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED;
+        }
+
+        if (!permissions)
+            ActivityCompat.requestPermissions(this, permissionsId, callbackID);
+    }
+
+
+    // Firebase cloud based text recognition - slower but more accurate
     private void runFirebaseTextRecognition() {
         FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromBitmap(bitmap);
 
@@ -70,7 +101,9 @@ public class Display extends AppCompatActivity {
 
     }
 
+    // Firebase cloud based text recognition - slower but more accurate
     private void showFirebaseText(FirebaseVisionText firebaseVisionText) {
+
         List<FirebaseVisionText.TextBlock> block = firebaseVisionText.getTextBlocks();
         String sentence = "";
         if (block.size() == 0) {
@@ -85,10 +118,12 @@ public class Display extends AppCompatActivity {
         }
     }
 
+    // Helper function to make calling toast easier
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
+    // On-board text recognition - faster but at the cost of accuracy
     private void runTextRecognition() {
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         TextRecognizer recognizer = TextRecognition.getClient();
@@ -102,6 +137,7 @@ public class Display extends AppCompatActivity {
                         });
     }
 
+    // On-board text recognition - faster but at the cost of accuracy
     private void processTextRecognitionResult(Text texts) {
         String sentence = "";
         List<Text.TextBlock> blocks = texts.getTextBlocks();
@@ -115,5 +151,20 @@ public class Display extends AppCompatActivity {
             }
             showToast(sentence);
         }
+    }
+
+    // Add event to calendar
+    public void saveEventOnClick(View view) {
+        ContentResolver cr = this.getContentResolver();
+        ContentValues cv = new ContentValues();
+        cv.put(CalendarContract.Events.TITLE, "Hello");
+        cv.put(CalendarContract.Events.DESCRIPTION, "Something is up");
+        cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
+        cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis() + 60*60*1000);
+        cv.put(CalendarContract.Events.CALENDAR_ID, 1);
+        cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
+        Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+        showToast("Check your Calendar");
     }
 }

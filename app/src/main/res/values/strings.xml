@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CamToCal</string>
+    <string name="save_event_into_calendar">Save Event Into Calendar</string>
+    <string name="open_camera">Open Camera</string>
+    <string name="show_photo">Show photo</string>
+    <string name="welcome">Welcome! When you take your photo, please take it in landscape mode,
+        otherwise the text recognition may not work.</string>
 </resources>
