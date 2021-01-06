@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.CamToCal.R;
@@ -60,8 +62,29 @@ public class Display extends AppCompatActivity {
         bitmap = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
         calendarBtn = findViewById(R.id.calendarBtn);
         imageView.setImageBitmap(bitmap);
-        runFirebaseTextRecognition();
+        runFirebaseTextRecognition(DENSE_MODEL);
+        setupSwitch();
 //        runTextRecognition();
+    }
+
+    private void setupSwitch() {
+        Switch modelSwitch = findViewById(R.id.modelSwitch);
+
+        modelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                // If switch is toggled, use sparse_model instead of dense_model
+                if (isChecked) {
+                    showToast("Successfully set to sparse text type!");
+                    runFirebaseTextRecognition(SPARSE_MODEL);
+                } else {
+                    showToast("Successfully set to dense text type!");
+                    runFirebaseTextRecognition(DENSE_MODEL);
+                }
+            }
+        });
+
+
     }
 
 
@@ -78,12 +101,12 @@ public class Display extends AppCompatActivity {
 
 
     // Firebase cloud based text recognition - slower but more accurate
-    private void runFirebaseTextRecognition() {
+    private void runFirebaseTextRecognition(int model) {
         FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromBitmap(bitmap);
 
         FirebaseVisionCloudTextRecognizerOptions options =
                 new FirebaseVisionCloudTextRecognizerOptions.Builder()
-                .setLanguageHints(Arrays.asList("en")).setModelType(DENSE_MODEL)
+                .setLanguageHints(Arrays.asList("en")).setModelType(model)
                 .build();
 
 

@@ -5,4 +5,8 @@
     <string name="show_photo">Show photo</string>
     <string name="welcome">Welcome! When you take your photo, please take it in landscape mode,
         otherwise the text recognition may not work.</string>
+    <string name="troubleshoot">Text recognition not working as expected? Try to:
+    \n1 - Have good lighting and a clear photo of the text
+    \n2 - Make sure you are taking the photo in landscape mode
+    \n3 - Use the toggle below to see if the results are better </string>
 </resources>

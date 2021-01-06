@@ -34,7 +34,7 @@
     <TextView
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="81dp"
+        android:layout_height="105dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/welcome"
@@ -48,8 +48,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="458dp"
+        android:layout_width="410dp"
+        android:layout_height="439dp"
         app:layout_constraintBottom_toTopOf="@+id/openGallery"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
