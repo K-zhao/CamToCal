@@ -37,13 +37,18 @@ import com.google.mlkit.vision.text.TextRecognizer;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
+import com.joestelmach.natty.*;
+
 public class Display extends AppCompatActivity {
 
+    // Global variables
     private Bitmap bitmap;
     private Button calendarBtn;
+    private String sentence = "";
     final int callbackID = 42;
 
 
@@ -64,6 +69,7 @@ public class Display extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
         runFirebaseTextRecognition(DENSE_MODEL);
         setupSwitch();
+        setupCalendarButton();
 //        runTextRecognition();
     }
 
@@ -99,7 +105,6 @@ public class Display extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, permissionsId, callbackID);
     }
 
-
     // Firebase cloud based text recognition - slower but more accurate
     private void runFirebaseTextRecognition(int model) {
         FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromBitmap(bitmap);
@@ -123,8 +128,8 @@ public class Display extends AppCompatActivity {
 
 
     }
-
     // Firebase cloud based text recognition - slower but more accurate
+
     private void showFirebaseText(FirebaseVisionText firebaseVisionText) {
 
         List<FirebaseVisionText.TextBlock> block = firebaseVisionText.getTextBlocks();
@@ -140,13 +145,12 @@ public class Display extends AppCompatActivity {
             showToast(sentence);
         }
     }
-
     // Helper function to make calling toast easier
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
-
     // On-board text recognition - faster but at the cost of accuracy
+
     private void runTextRecognition() {
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         TextRecognizer recognizer = TextRecognition.getClient();
@@ -159,8 +163,8 @@ public class Display extends AppCompatActivity {
                             e.printStackTrace();
                         });
     }
-
     // On-board text recognition - faster but at the cost of accuracy
+
     private void processTextRecognitionResult(Text texts) {
         String sentence = "";
         List<Text.TextBlock> blocks = texts.getTextBlocks();
@@ -177,17 +181,31 @@ public class Display extends AppCompatActivity {
     }
 
     // Add event to calendar
-    public void saveEventOnClick(View view) {
-        ContentResolver cr = this.getContentResolver();
-        ContentValues cv = new ContentValues();
-        cv.put(CalendarContract.Events.TITLE, "Hello");
-        cv.put(CalendarContract.Events.DESCRIPTION, "Something is up");
-        cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
-        cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis() + 60*60*1000);
-        cv.put(CalendarContract.Events.CALENDAR_ID, 1);
-        cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
-        Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+    private void setupCalendarButton() {
 
-        showToast("Check your Calendar");
+        calendarBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar cal = Calendar.getInstance();
+                // Get timezone of user
+                TimeZone tz = cal.getTimeZone();
+
+                // Attempts to figure out which date due to potential ambiguity of user inputted dates
+                calendarBtn = findViewById(R.id.calendarBtn);
+                Parser parser = new Parser(tz);
+                List<DateGroup> groups = parser.parse(sentence);
+
+                ContentResolver cr = getApplication().getContentResolver();
+                ContentValues cv = new ContentValues();
+                cv.put(CalendarContract.Events.TITLE, "Hello");
+                cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
+                cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis() + 60*60*1000);
+                cv.put(CalendarContract.Events.CALENDAR_ID, 1);
+                cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
+                Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                showToast("Check your Calendar");
+            }
+        });
     }
 }

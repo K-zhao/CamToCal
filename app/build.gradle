@@ -30,6 +30,8 @@ android {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.joestelmach/natty
+    compile group: 'com.joestelmach', name: 'natty', version: '0.13'
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
     implementation 'com.google.firebase:firebase-ml-vision'
     def camerax_version = "1.0.0-beta07"
