@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -34,8 +35,11 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -49,6 +53,7 @@ public class Display extends AppCompatActivity {
     private Bitmap bitmap;
     private Button calendarBtn;
     private String sentence = "";
+    private String LOGNAME = "calendarlog";
     final int callbackID = 42;
 
 
@@ -133,7 +138,7 @@ public class Display extends AppCompatActivity {
     private void showFirebaseText(FirebaseVisionText firebaseVisionText) {
 
         List<FirebaseVisionText.TextBlock> block = firebaseVisionText.getTextBlocks();
-        String sentence = "";
+        sentence = "";
         if (block.size() == 0) {
             showToast("No text found");
             return;
@@ -194,17 +199,42 @@ public class Display extends AppCompatActivity {
                 calendarBtn = findViewById(R.id.calendarBtn);
                 Parser parser = new Parser(tz);
                 List<DateGroup> groups = parser.parse(sentence);
+                Log.d(LOGNAME, "hello");
+                for(DateGroup group:groups) {
+                    ArrayList<Date> dates = new ArrayList<Date> (group.getDates());
+                    int line = group.getLine();
+                    int column = group.getPosition();
+                    String matchingValue = group.getText();
+                    Log.d(LOGNAME, "line" + String.valueOf(line));
+                    Log.d(LOGNAME, "column"+ String.valueOf(column));
+                    Log.d(LOGNAME, "text" + matchingValue);
+                    long eventTime = 0;
+                    for (int x = 0; x < dates.size(); x++) {
+                        Log.d(LOGNAME, "dates" + dates.get(x).toString());
+                        Date date = dates.get(x);
+                        eventTime = date.getTime();
+                    }
 
-                ContentResolver cr = getApplication().getContentResolver();
-                ContentValues cv = new ContentValues();
-                cv.put(CalendarContract.Events.TITLE, "Hello");
-                cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
-                cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis() + 60*60*1000);
-                cv.put(CalendarContract.Events.CALENDAR_ID, 1);
-                cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
-                Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+                    // Title is everything with time/date removed
+                    String title =  sentence.replace(matchingValue, "");
 
-                showToast("Check your Calendar");
+
+                    // Add event to calendar
+                    ContentResolver cr = getApplication().getContentResolver();
+                    ContentValues cv = new ContentValues();
+                    cv.put(CalendarContract.Events.TITLE, title);
+                    cv.put(CalendarContract.Events.DTSTART, eventTime);
+                    cv.put(CalendarContract.Events.DTEND, eventTime + 86400000);
+                    cv.put(CalendarContract.Events.CALENDAR_ID, 1);
+                    cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
+                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                    showToast("Check your Calendar");
+
+                }
+
+
+
             }
         });
     }
