@@ -68,13 +68,22 @@ public class Display extends AppCompatActivity {
         setContentView(R.layout.activity_display);
         String[] permissions = {Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR};
         checkPermission(callbackID, permissions);
-        ImageView imageView = findViewById(R.id.imageView2);
-        bitmap = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
-        calendarBtn = findViewById(R.id.calendarBtn);
-        imageView.setImageBitmap(bitmap);
-        runFirebaseTextRecognition(DENSE_MODEL);
-        setupSwitch();
-        setupCalendarButton();
+
+        // Error handling if the user attempts to access the activity without sending a photo through
+        try {
+            ImageView imageView = findViewById(R.id.imageView2);
+            bitmap = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
+            imageView.setImageBitmap(bitmap);
+            calendarBtn = findViewById(R.id.calendarBtn);
+            runFirebaseTextRecognition(DENSE_MODEL);
+            setupSwitch();
+            setupCalendarButton();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            showToast("Take a photo or pick one from the gallery first.");
+        }
+
+
 //        runTextRecognition();
     }
 
@@ -125,7 +134,7 @@ public class Display extends AppCompatActivity {
 
         textRecognizer.processImage(firebaseImage)
                 .addOnSuccessListener(firebaseVisionText -> {
-                    showToast("Success!");
+                    showToast("Successfully found text!");
                     showFirebaseText(firebaseVisionText);
 
                 })
@@ -233,6 +242,11 @@ public class Display extends AppCompatActivity {
 
                 }
 
+
+                // Alerts user if the calendar failed to add event due to unrecognizable dates
+                if (groups.size() == 0) {
+                    showToast("Couldn't find any dates.");
+                }
 
 
             }

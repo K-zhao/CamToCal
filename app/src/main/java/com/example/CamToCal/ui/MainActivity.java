@@ -33,6 +33,7 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static boolean hasPhoto = false;
 
     String currentPhotoPath;
 
@@ -77,15 +78,23 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imageFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                hasPhoto = true;
             }
 
         }
     }
 
     public void showPicture(View view) {
-        Intent intent = new Intent(this,Display.class);
-        intent.putExtra("image_path",currentPhotoPath);
-        startActivity(intent);
+        if (hasPhoto) {
+            Intent intent = new Intent(this,Display.class);
+            intent.putExtra("image_path",currentPhotoPath);
+            startActivity(intent);
+        } else {
+            showToast("Please pick or take a photo first.");
+        }
+    }
 
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 }
