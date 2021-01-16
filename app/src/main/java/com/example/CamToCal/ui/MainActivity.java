@@ -34,12 +34,18 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int PICK_IMAGE = 2;
     static boolean hasPhoto = false;
     private String LOGNAME = "calendarlog";
+    String[] permissions = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA};
+    final int callbackID = 42;
 
     String currentPhotoPath = "";
 
@@ -47,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkPermission(callbackID, permissions);
         setupGalleryBtn();
     }
 
@@ -142,5 +149,16 @@ public class MainActivity extends AppCompatActivity {
             return cursor.getString(column_index);
         }
         return null;
+    }
+
+    // Ask for permission to access user calendar
+    private void checkPermission(int callbackID, String[] permissionsId) {
+        boolean permissions = true;
+        for (String p : permissionsId) {
+            permissions = permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED;
+        }
+
+        if (!permissions)
+            ActivityCompat.requestPermissions(this, permissionsId, callbackID);
     }
 }
