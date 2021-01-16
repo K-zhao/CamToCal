@@ -7,15 +7,19 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,15 +37,17 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int PICK_IMAGE = 2;
     static boolean hasPhoto = false;
+    private String LOGNAME = "calendarlog";
 
-    String currentPhotoPath;
+    String currentPhotoPath = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        setupGalleryBtn();
     }
 
 
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showPicture(View view) {
         if (hasPhoto) {
+            Log.d(LOGNAME, currentPhotoPath);
             Intent intent = new Intent(this,Display.class);
             intent.putExtra("image_path",currentPhotoPath);
             startActivity(intent);
@@ -94,7 +101,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupGalleryBtn() {
+        Button galleryBtn = findViewById(R.id.openGallery);
+        galleryBtn.setOnClickListener(view -> {
+            hasPhoto = true;
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_PICK);
+            startActivityForResult(intent, PICK_IMAGE);
+        });
+
+    }
+
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK)
+            if (requestCode == PICK_IMAGE) {
+                Uri selectedImage = data.getData();
+                currentPhotoPath = getRealPathFromURI(selectedImage, this);
+                Log.d(LOGNAME, currentPhotoPath);
+            }
+    }
+
+    // Gets appropriate string from gallery photo URI
+    public String getRealPathFromURI(Uri contentURI, Activity context) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        @SuppressWarnings("deprecation")
+        Cursor cursor = context.managedQuery(contentURI, projection, null,
+                null, null);
+        if (cursor == null)
+            return null;
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        if (cursor.moveToFirst()) {
+            return cursor.getString(column_index);
+        }
+        return null;
     }
 }

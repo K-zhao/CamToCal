@@ -9,4 +9,6 @@
     \n1 - Have good lighting and a clear photo of the text
     \n2 - Make sure you are taking the photo in landscape mode
     \n3 - Use the toggle below to see if the results are better </string>
+    <string name="open_gallery">Open Gallery</string>
+    <string name="dense_text_sparse_text">Dense Text // Sparse Text</string>
 </resources>

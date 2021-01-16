@@ -36,7 +36,7 @@
         android:id="@+id/modelSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dense Text // Sparse Text"
+        android:text="@string/dense_text_sparse_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.551"

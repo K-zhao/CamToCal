@@ -66,7 +66,10 @@ public class Display extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
-        String[] permissions = {Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR};
+        String[] permissions = {
+                Manifest.permission.READ_CALENDAR,
+                Manifest.permission.WRITE_CALENDAR,
+                Manifest.permission.READ_EXTERNAL_STORAGE};
         checkPermission(callbackID, permissions);
 
         // Error handling if the user attempts to access the activity without sending a photo through
@@ -90,17 +93,14 @@ public class Display extends AppCompatActivity {
     private void setupSwitch() {
         Switch modelSwitch = findViewById(R.id.modelSwitch);
 
-        modelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                // If switch is toggled, use sparse_model instead of dense_model
-                if (isChecked) {
-                    showToast("Successfully set to sparse text type!");
-                    runFirebaseTextRecognition(SPARSE_MODEL);
-                } else {
-                    showToast("Successfully set to dense text type!");
-                    runFirebaseTextRecognition(DENSE_MODEL);
-                }
+        modelSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            // If switch is toggled, use sparse_model instead of dense_model
+            if (isChecked) {
+                showToast("Successfully set to sparse text type!");
+                runFirebaseTextRecognition(SPARSE_MODEL);
+            } else {
+                showToast("Successfully set to dense text type!");
+                runFirebaseTextRecognition(DENSE_MODEL);
             }
         });
 
@@ -134,7 +134,7 @@ public class Display extends AppCompatActivity {
 
         textRecognizer.processImage(firebaseImage)
                 .addOnSuccessListener(firebaseVisionText -> {
-                    showToast("Successfully found text!");
+                    showToast("Text recognition...");
                     showFirebaseText(firebaseVisionText);
 
                 })
@@ -197,59 +197,56 @@ public class Display extends AppCompatActivity {
     // Add event to calendar
     private void setupCalendarButton() {
 
-        calendarBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar cal = Calendar.getInstance();
-                // Get timezone of user
-                TimeZone tz = cal.getTimeZone();
+        calendarBtn.setOnClickListener(view -> {
+            Calendar cal = Calendar.getInstance();
+            // Get timezone of user
+            TimeZone tz = cal.getTimeZone();
 
-                // Attempts to figure out which date due to potential ambiguity of user inputted dates
-                calendarBtn = findViewById(R.id.calendarBtn);
-                Parser parser = new Parser(tz);
-                List<DateGroup> groups = parser.parse(sentence);
-                Log.d(LOGNAME, "hello");
-                for(DateGroup group:groups) {
-                    ArrayList<Date> dates = new ArrayList<Date> (group.getDates());
-                    int line = group.getLine();
-                    int column = group.getPosition();
-                    String matchingValue = group.getText();
-                    Log.d(LOGNAME, "line" + String.valueOf(line));
-                    Log.d(LOGNAME, "column"+ String.valueOf(column));
-                    Log.d(LOGNAME, "text" + matchingValue);
-                    long eventTime = 0;
-                    for (int x = 0; x < dates.size(); x++) {
-                        Log.d(LOGNAME, "dates" + dates.get(x).toString());
-                        Date date = dates.get(x);
-                        eventTime = date.getTime();
-                    }
-
-                    // Title is everything with time/date removed
-                    String title =  sentence.replace(matchingValue, "");
-
-
-                    // Add event to calendar
-                    ContentResolver cr = getApplication().getContentResolver();
-                    ContentValues cv = new ContentValues();
-                    cv.put(CalendarContract.Events.TITLE, title);
-                    cv.put(CalendarContract.Events.DTSTART, eventTime);
-                    cv.put(CalendarContract.Events.DTEND, eventTime + 86400000);
-                    cv.put(CalendarContract.Events.CALENDAR_ID, 1);
-                    cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
-                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
-
-                    showToast("Check your Calendar");
-
+            // Attempts to figure out which date due to potential ambiguity of user inputted dates
+            calendarBtn = findViewById(R.id.calendarBtn);
+            Parser parser = new Parser(tz);
+            List<DateGroup> groups = parser.parse(sentence);
+            Log.d(LOGNAME, "hello");
+            for(DateGroup group:groups) {
+                ArrayList<Date> dates = new ArrayList<Date> (group.getDates());
+                int line = group.getLine();
+                int column = group.getPosition();
+                String matchingValue = group.getText();
+                Log.d(LOGNAME, "line" + String.valueOf(line));
+                Log.d(LOGNAME, "column"+ String.valueOf(column));
+                Log.d(LOGNAME, "text" + matchingValue);
+                long eventTime = 0;
+                for (int x = 0; x < dates.size(); x++) {
+                    Log.d(LOGNAME, "dates" + dates.get(x).toString());
+                    Date date = dates.get(x);
+                    eventTime = date.getTime();
                 }
 
+                // Title is everything with time/date removed
+                String title =  sentence.replace(matchingValue, "");
 
-                // Alerts user if the calendar failed to add event due to unrecognizable dates
-                if (groups.size() == 0) {
-                    showToast("Couldn't find any dates.");
-                }
 
+                // Add event to calendar
+                ContentResolver cr = getApplication().getContentResolver();
+                ContentValues cv = new ContentValues();
+                cv.put(CalendarContract.Events.TITLE, title);
+                cv.put(CalendarContract.Events.DTSTART, eventTime);
+                cv.put(CalendarContract.Events.DTEND, eventTime + 86400000);
+                cv.put(CalendarContract.Events.CALENDAR_ID, 1);
+                cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
+                Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                showToast("Check your Calendar");
 
             }
+
+
+            // Alerts user if the calendar failed to add event due to unrecognizable dates
+            if (groups.size() == 0) {
+                showToast("Couldn't find any dates.");
+            }
+
+
         });
     }
 }

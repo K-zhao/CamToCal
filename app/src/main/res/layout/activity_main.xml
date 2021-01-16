@@ -6,30 +6,58 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
+
+
     <Button
-        android:id="@+id/enableCamera"
-        android:layout_width="match_parent"
-        android:layout_height="129dp"
+        android:id="@+id/openCamera"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:gravity="center"
         android:onClick="takePicture"
         android:text="@string/open_camera"
+        android:layout_marginStart="0dp"
         app:iconPadding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.991" />
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintStart_toEndOf="@+id/openGallery"
+        app:layout_constraintTop_toBottomOf="@+id/showPhoto"
+        app:layout_constraintVertical_bias="1.0"
+
+        />
+
 
     <Button
         android:id="@+id/openGallery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/show_photo"
-        android:onClick="showPicture"
-        app:layout_constraintBottom_toTopOf="@+id/enableCamera"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:onClick="takePicture"
+        android:text="@string/open_gallery"
+        android:layout_marginEnd="10dp"
+        app:iconPadding="0dp"
+        app:layout_constraintHorizontal_weight=".5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/openCamera"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/container"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/showPhoto"
+        app:layout_constraintVertical_bias="0.798" />
+
+
+    <Button
+        android:id="@+id/showPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="92dp"
+        android:onClick="showPicture"
+
+        android:text="@string/show_photo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.74" />
 
     <TextView
         android:id="@+id/container"
@@ -42,20 +70,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"></TextView>
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="410dp"
-        android:layout_height="439dp"
-        app:layout_constraintBottom_toTopOf="@+id/openGallery"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/container"
-        app:layout_constraintVertical_bias="1.0"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintVertical_bias="0.025" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
