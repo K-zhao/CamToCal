@@ -231,7 +231,7 @@ public class Display extends AppCompatActivity {
                 ContentValues cv = new ContentValues();
                 cv.put(CalendarContract.Events.TITLE, title);
                 cv.put(CalendarContract.Events.DTSTART, eventTime);
-                cv.put(CalendarContract.Events.DTEND, eventTime + 86400000);
+                cv.put(CalendarContract.Events.DTEND, eventTime + 3600000);
                 cv.put(CalendarContract.Events.CALENDAR_ID, 1);
                 cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
                 Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
